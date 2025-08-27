@@ -1,6 +1,6 @@
-from pydantic import BaseSettings
 from typing import List, Optional
 import os
+from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
@@ -12,8 +12,10 @@ class Settings(BaseSettings):
     JWT_AUDIENCE: str = os.getenv("JWT_AUDIENCE", "cracknum-clients")
     ACCESS_TTL_S: int = int(os.getenv("ACCESS_TTL_S", "3600"))
     REFRESH_TTL_S: int = int(os.getenv("REFRESH_TTL_S", str(24 * 3600)))
+    COOKIE_DOMAIN: Optional[str] = os.getenv("COOKIE_DOMAIN")
+
     COOKIE_SECURE: bool = os.getenv("COOKIE_SECURE", "false").lower() == "true"
-    COOKIE_DOMAIN: str | None = os.getenv("COOKIE_DOMAIN") or None
+    COOKIE_SAMESITE: str = os.getenv("COOKIE_SAMESITE", "lax")
 
     ADMIN_USER: str = os.getenv("ADMIN_USER", "admin")
     ADMIN_PASSWORD: str = os.getenv("ADMIN_PASSWORD", "admin")

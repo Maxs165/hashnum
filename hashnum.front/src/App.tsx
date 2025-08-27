@@ -2,8 +2,8 @@ import React from 'react'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { AuthProvider } from './auth'
 import Protected from './Protected'
-import Login from './pages/Login'
-import Dashboard from './pages'  
+import Login from './Login'     
+import Dashboard from './index' 
 
 const router = createBrowserRouter([
   { path: '/login', element: <Login /> },

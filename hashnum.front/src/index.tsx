@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { API, ensureToken } from '../api'
-import type { TaskInfo, TaskStatus, LogChunk } from '../types'
+import { API, ensureToken } from './api'
+import type { TaskInfo, TaskStatus, LogChunk } from './types'
 
 export default function Dashboard() {
   const [file, setFile] = useState<File | null>(null)

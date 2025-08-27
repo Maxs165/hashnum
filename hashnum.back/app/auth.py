@@ -50,20 +50,17 @@ def _make_jwt(sub: str, typ: str, ttl: int, extra: Optional[dict] = None) -> Tup
     return token, jti, payload["exp"]
 
 
-def _set_cookie(resp, name: str, value: str, max_age: int):
-    kwargs = dict(
+def _set_cookie(resp: Response, name: str, value: str, max_age: int):
+    resp.set_cookie(
         key=name,
         value=value,
         max_age=max_age,
         httponly=True,
-        samesite="lax",
-        path="/",
         secure=settings.COOKIE_SECURE,
+        samesite=settings.COOKIE_SAMESITE,
+        domain=settings.COOKIE_DOMAIN,
+        path="/",
     )
-    if settings.COOKIE_DOMAIN and settings.COOKIE_DOMAIN != "localhost":
-        kwargs["domain"] = settings.COOKIE_DOMAIN
-
-    resp.set_cookie(**kwargs)
 
 
 def _add_to_blocklist(jti: str, ttl: int):
