@@ -1,0 +1,45 @@
+version: "3.11"
+
+services:
+  api:
+    build:
+      context: ./hashnum.back
+    container_name: hashnum-api
+    restart: unless-stopped
+    env_file: ./hashnum.back/.env
+    ports:
+      - "8000:8000"
+    depends_on: [redis]
+    volumes:
+      - ./hashnum.back/data:/var/lib/cracknum/runtime
+      - /opt/hashnum/hashcat:/opt/hashnum/hashcat:ro
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+
+  worker:
+    build:
+      context: ./hashnum.back
+    container_name: hashnum-worker
+    restart: unless-stopped
+    env_file: ./hashnum.back/.env
+    depends_on: [redis]
+    volumes:
+      - ./hashnum.back/data:/var/lib/cracknum/runtime
+      - /opt/hashnum/hashcat:/opt/hashnum/hashcat:ro
+    command: rq worker -u redis://redis:6379 ${RQ_QUEUE:-tasks}
+
+  redis:
+    image: redis:7-alpine
+    container_name: hashnum-redis
+    restart: unless-stopped
+
+  front:
+    build:
+      context: ./hashnum.front
+      args:
+        - VITE_API_URL=${VITE_API_URL:-http://localhost:8000}
+    container_name: hashnum-front
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+
+
