@@ -12,9 +12,15 @@ from .storage import task_paths
 
 app = FastAPI(title="CrackNum API", version="1.2.0")
 
+origins = (
+    settings.CORS_ORIGINS
+    if isinstance(settings.CORS_ORIGINS, list)
+    else [o.strip() for o in str(settings.CORS_ORIGINS).split(",") if o.strip()]
+)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[o.strip() for o in settings.CORS_ORIGINS.split(",") if o.strip()],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
