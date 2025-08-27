@@ -36,7 +36,7 @@ services:
     build:
       context: ./hashnum.front
       args:
-        - VITE_API_URL=${VITE_API_URL:-http://localhost:8000}
+        VITE_API_URL: "http://test.ex00.ru:8000"
     container_name: hashnum-front
     restart: unless-stopped
     ports:
