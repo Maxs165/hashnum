@@ -6,8 +6,7 @@ export default function Login() {
   const { login } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
-  const from =
-    (location.state as { from?: { pathname?: string } } | null)?.from?.pathname ?? '/'
+  const from = (location.state as { from?: { pathname?: string } } | null)?.from?.pathname ?? '/'
 
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -21,7 +20,7 @@ export default function Login() {
     setBusy(true)
     try {
       await login(username, password)
-      navigate(from, { replace: true })
+      navigate(from, { replace: true })         
     } catch {
       setErr('Ошибка входа. Проверь логин/пароль.')
     } finally {
@@ -34,19 +33,8 @@ export default function Login() {
       <div className="card">
         <h2>Login</h2>
         <form onSubmit={onSubmit} className="row" style={{ marginTop: 12 }}>
-          <input
-            className="input"
-            placeholder="Username"
-            value={username}
-            onChange={e => setUsername(e.target.value)}
-          />
-          <input
-            className="input"
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-          />
+          <input className="input" placeholder="Username" value={username} onChange={e => setUsername(e.target.value)} />
+          <input className="input" type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} />
           <button className="btn" type="submit" disabled={busy || !username || !password}>
             {busy ? 'Входим…' : 'Войти'}
           </button>
