@@ -1,7 +1,7 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
-from .auth import verify_jwt
+from .auth import verify_session
 from .auth import router as auth_router
 from .config import settings
 import uuid
@@ -11,7 +11,6 @@ from .storage import task_paths
 
 
 app = FastAPI(title="CrackNum API", version="1.2.0")
-
 origins = (
     settings.CORS_ORIGINS
     if isinstance(settings.CORS_ORIGINS, list)
@@ -35,7 +34,7 @@ def health():
 
 
 @app.post("/upload", response_model=TaskInfo)
-async def upload(file: UploadFile = File(...), _: str = Depends(verify_jwt)):
+async def upload(file: UploadFile = File(...), _: str = Depends(verify_session)):
     task_id = uuid.uuid4().hex
     in_file, _, _ = task_paths(task_id)
     content = await file.read()
@@ -44,7 +43,7 @@ async def upload(file: UploadFile = File(...), _: str = Depends(verify_jwt)):
 
 
 @app.post("/crack/{task_id}", response_model=TaskInfo)
-async def crack(task_id: str, body: CrackCreate, _: str = Depends(verify_jwt)):
+async def crack(task_id: str, body: CrackCreate, _: str = Depends(verify_session)):
     in_file, _, _ = task_paths(task_id)
     if not in_file.exists():
         raise HTTPException(404, "task input not found; upload first")
@@ -53,7 +52,7 @@ async def crack(task_id: str, body: CrackCreate, _: str = Depends(verify_jwt)):
 
 
 @app.get("/status/{task_id}", response_model=TaskStatus)
-def status(task_id: str, _: str = Depends(verify_jwt)):
+def status(task_id: str, _: str = Depends(verify_session)):
     st = get_status(task_id)
     if st.get("status") == "unknown":
         raise HTTPException(404, "task not found")
@@ -61,7 +60,7 @@ def status(task_id: str, _: str = Depends(verify_jwt)):
 
 
 @app.get("/logs/{task_id}", response_model=LogChunk)
-def logs(task_id: str, cursor: int = 0, _: str = Depends(verify_jwt)):
+def logs(task_id: str, cursor: int = 0, _: str = Depends(verify_session)):
     key = f"log:{task_id}"
     total = redis.llen(key)
     cursor = max(0, min(cursor, total))
@@ -70,7 +69,7 @@ def logs(task_id: str, cursor: int = 0, _: str = Depends(verify_jwt)):
 
 
 @app.get("/download/{task_id}")
-def download(task_id: str, _: str = Depends(verify_jwt)):
+def download(task_id: str, _: str = Depends(verify_session)):
     _, out_file, _ = task_paths(task_id)
     if not out_file.exists():
         raise HTTPException(404, "result not ready")
